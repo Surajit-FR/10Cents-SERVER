@@ -1,14 +1,16 @@
-import { Request, Response } from "express";
-import { asyncHandler } from "../utils/asyncHandler";
-import UserModel from "../models/user.model";
-import { sendSuccessResponse } from "../utils/response";
+const { asyncHandler } = require("../utils/asyncHandler");
+const UserModel = require("../models/user.model");
+const { sendSuccessResponse } = require("../utils/response");
+
+// Remove Request and Response as they are TypeScript types
+
 
 // getAllUsers controller
-export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
+const getAllUsers = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query = '', sortBy = 'createdAt', sortType = 'desc' } = req.query;
 
-    const pageNumber = parseInt(page as string, 10);
-    const limitNumber = parseInt(limit as string, 10);
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
 
     const searchQuery = query
         ? {
@@ -26,8 +28,8 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
         ...searchQuery
     };
 
-    const sortCriteria: any = {};
-    sortCriteria[sortBy as string] = sortType === 'desc' ? -1 : 1;
+    const sortCriteria = {};
+    sortCriteria[sortBy] = sortType === 'desc' ? -1 : 1;
 
     const results = await UserModel.aggregate([
         { $match: matchCriteria },
@@ -54,3 +56,37 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
         }
     }, "Customer list retrieved successfully.");
 });
+
+// get loggedin user
+const getUser = asyncHandler(async (req, res) => {
+
+    const { userId } = req.query
+
+    const userDetails = await UserModel.aggregate([
+        {
+            $match: {
+                isDeleted: false,
+                _id: userId
+            }
+        },
+        {
+            $project: {
+                firstName: 1,
+                lastName: 1,
+                email: 1,
+                phone: 1,
+                avatar: 1,
+                createdAt: 1,
+            }
+        }
+    ]);
+
+    return sendSuccessResponse(res, 200,
+        userDetails[0],
+        "Loggedin user retrieved successfully.");
+});
+
+module.exports = {
+    getAllUsers,
+    getUser
+}

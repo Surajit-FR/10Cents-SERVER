@@ -1,10 +1,13 @@
-import mongoose, { Schema, Model } from "mongoose";
-import bcryptjs from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { IUser } from "../../types/schemaTypes";
+const mongoose = require("mongoose");
+const { Schema, Model } = mongoose;
+const bcryptjs = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+// Remove IUser import since it's a TypeScript type
 
 
-const UserSchema: Schema<IUser> = new Schema({
+
+const UserSchema = new Schema({
     fullName: {
         type: String,
         required: false,
@@ -66,10 +69,6 @@ const UserSchema: Schema<IUser> = new Schema({
         enum: ["SuperAdmin", "Customer"],
         default: ""
     },
-    refreshToken: {
-        type: String,
-        default: "",
-    },
     isDeleted: {
         type: Boolean,
         default: false,
@@ -82,33 +81,33 @@ UserSchema.pre("save", async function (next) {
     try {
         this.password = await bcryptjs.hash(this.password, 10);
         next();
-    } catch (err: any) {
+    } catch (err) {
         next(err)
     }
 });
 
 //check password
-UserSchema.methods.isPasswordCorrect = async function (password: string): Promise<boolean> {
+UserSchema.methods.isPasswordCorrect = async function (password) {
     return await bcryptjs.compare(password, this.password)
 }
 
 //generate acces token
-UserSchema.methods.generateAccessToken = function (): string {
+UserSchema.methods.generateAccessToken = function () {
     return jwt.sign({
         _id: this._id,
         email: this.email,
         username: this.username,
         fullName: this.fullName,
-    }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY })
+    }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY })
 };
 
-UserSchema.methods.generateRefreshToken = function (): string {
+UserSchema.methods.generateRefreshToken = function () {
     return jwt.sign({
         _id: this._id
-    }, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: process.env.REFRESH_TOKEN_EXPIRY })
+    }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRY })
 };
 
 
-const UserModel: Model<IUser> = mongoose.model<IUser>("user", UserSchema);
-export default UserModel;
+const UserModel = mongoose.model("user", UserSchema);
+module.exports = UserModel;
 

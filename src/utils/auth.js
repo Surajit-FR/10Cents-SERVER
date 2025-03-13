@@ -1,17 +1,14 @@
-import UserModel from "../models/user.model";
-import { IRegisterCredentials } from "../../types/requests_responseType";
-import { ApiError } from "../utils/ApisErrors";
+const UserModel = require("../models/user.model");
+const { ApiError } = require("./ApisErrors");
 
 
-export const addUser = async (userData: IRegisterCredentials) => {
+const addUser = async (userData) => {
     const { firstName, lastName, email, password, userType, phone } = userData;
-    let permission;
 
     // Check for duplicate user
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
-        throw new ApiError(409, "User with email already exists");
-    }
+        throw new Error("User with email already exists");    }
 
     // Create the new user
     const newUser = new UserModel({
@@ -27,3 +24,7 @@ export const addUser = async (userData: IRegisterCredentials) => {
 
     return savedUser;
 };
+
+module.exports = {
+    addUser
+}

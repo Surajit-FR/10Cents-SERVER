@@ -1,11 +1,12 @@
-import { Response, NextFunction } from 'express';
-import UserModel from '../../models/user.model';
-import { CustomRequest } from '../../../types/commonType';
-import { asyncHandler } from '../../utils/asyncHandler';
+const UserModel = require("../../models/user.model");
+const { asyncHandler } = require("../../utils/asyncHandler");
+
+// Remove Response, NextFunction, and CustomRequest as they are TypeScript types
+
 
 
 // HandleSocialAuthError
-export const HandleSocialAuthError = asyncHandler(async (req: CustomRequest, res: Response, next: NextFunction) => {
+const HandleSocialAuthError = asyncHandler(async (req, res, next) => {
     const { email, uid, displayName, photoURL, phoneNumber } = req.body;
 
     try {
@@ -40,8 +41,12 @@ export const HandleSocialAuthError = asyncHandler(async (req: CustomRequest, res
             return next();
         }
 
-    } catch (exc: any) {
+    } catch (exc) {
         console.log(exc.message);
         return res.status(500).json({ success: false, message: "Something went wrong. Please try again.", error: exc.message });
     }
 });
+
+module.exports = {
+    HandleSocialAuthError
+}

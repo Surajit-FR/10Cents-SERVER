@@ -1,21 +1,17 @@
-import { Request, Response } from "express";
-import UserModel from "../../models/user.model";
-import { ApiError } from "../../utils/ApisErrors";
-import { addUser } from "../../utils/auth";
-import { IRegisterCredentials } from "../../../types/requests_responseType";
-import { sendErrorResponse } from "../../utils/response";
-import { generateAccessAndRefreshToken } from "../../utils/createTokens";
-import { CustomRequest } from "../../../types/commonType";
-import { ApiResponse } from "../../utils/ApiResponse";
-import { asyncHandler } from "../../utils/asyncHandler";
-import { IUser } from "../../../types/schemaTypes";
-import { GoogleAuth } from "../../utils/socialAuth"
-import jwt, { JwtPayload } from 'jsonwebtoken';
-import { ObjectId } from "mongoose";
+const UserModel = require("../../models/user.model");
+const { ApiError } = require("../../utils/ApisErrors");
+const { addUser } = require("../../utils/auth");
+const { sendErrorResponse } = require("../../utils/response");
+const { generateAccessAndRefreshToken } = require("../../utils/createTokens");
+const { ApiResponse } = require("../../utils/ApiResponse");
+const { asyncHandler } = require("../../utils/asyncHandler");
+const { GoogleAuth } = require("../../utils/socialAuth");
+const jwt = require("jsonwebtoken");
+
 
 
 // fetchUserData func.
-const fetchUserData = async (userId: string | ObjectId) => {
+const fetchUserData = async (userId) => {
     const user = await UserModel.aggregate([
         {
             $match: {
@@ -34,29 +30,28 @@ const fetchUserData = async (userId: string | ObjectId) => {
 };
 
 // Set cookieOption
-const cookieOption: { httpOnly: boolean, secure: boolean, maxAge: number, sameSite: 'lax' | 'strict' | 'none' } = {
+const cookieOption = {
     httpOnly: true,
     secure: true,
     maxAge: 24 * 60 * 60 * 1000, // 1 Day
     sameSite: 'strict'
 };
 
+
 // register user controller
-export const registerUser = asyncHandler(async (req: Request, res: Response) => {
-    const userData: IRegisterCredentials = req.body;
+const registerUser = asyncHandler(async (req, res) => {
+    const userData = req.body;
 
     const savedUser = await addUser(userData);
 
     const newUser = await fetchUserData(savedUser._id)
-    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(res, savedUser._id);
+    // const { accessToken, refreshToken } = await generateAccessAndRefreshToken(savedUser._id);
 
     return res.status(200)
         .json({
             statusCode: 200,
             data: {
-                user: newUser[0],
-                accessToken,
-                refreshToken
+                _id: newUser[0]._id,
             },
             message: "User Registered Successfully",
             success: true
@@ -64,56 +59,56 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
 });
 
 // login user controller
-export const loginUser = asyncHandler(async (req: Request, res: Response) => {
-    const { email, password, isAdminPanel }: IUser & { isAdminPanel?: boolean } = req.body;
+const loginUser = asyncHandler(async (req, res) => {
+    const { email, password, isAdminPanel } = req.body;
 
     if (!email) {
-        return sendErrorResponse(res, new ApiError(400, "Email is required"));
+        return res.status(400).json({ "errors": "Email is required" })
     }
 
     const user = await UserModel.findOne({ email });
 
     if (!user) {
-        return sendErrorResponse(res, new ApiError(400, "User does not exist"));
+        return res.status(400).json({ "errors": "User does not exist" })
     }
 
     const userId = user._id;
 
     const isPasswordValid = await user.isPasswordCorrect(password);
     if (!isPasswordValid) {
-        return sendErrorResponse(res, new ApiError(403, "Invalid user credentials"));
+        return res.status(403).json({ "errors": "Invalid user credentials" });
     }
 
     if (user.isDeleted) {
-        return sendErrorResponse(res, new ApiError(403, "Your account is temporarily banned. Please stay with us.", [], userId));
+        return res.status(403).json({ "errors": "Your account is temporarily banned. Please stay with us.", userId });
     }
 
     // Check for admin panel access
     if (isAdminPanel) {
         if (user.userType !== 'SuperAdmin') {
-            return sendErrorResponse(res, new ApiError(403, "Access denied. Only SuperAdmins can log in to the admin panel."));
+            return res.status(403).json({ "errors": "Access denied. Only SuperAdmins can log in to the admin panel." });
         }
     }
 
-    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(res, user._id);
+    // const { accessToken, refreshToken } = await generateAccessAndRefreshToken( user._id);
     const loggedInUser = await fetchUserData(user._id);
 
     return res.status(200)
-        .cookie("accessToken", accessToken, cookieOption)
-        .cookie("refreshToken", refreshToken, cookieOption)
         .json(
             new ApiResponse(
                 200,
-                { user: loggedInUser[0], accessToken, refreshToken },
+                { _id: loggedInUser[0]._id },
                 "User logged in successfully"
             )
         );
 });
 
 // logout user controller
-export const logoutUser = asyncHandler(async (req: CustomRequest, res: Response) => {
+const logoutUser = asyncHandler(async (req, res) => {
     if (!req.user || !req.user?._id) {
-        return sendErrorResponse(res, new ApiError(400, "User not found in request"));
+        return res.status(400).json({
+            message:"User not found in request"
+        });
     };
 
     const userId = req.user?._id;
@@ -129,7 +124,7 @@ export const logoutUser = asyncHandler(async (req: CustomRequest, res: Response)
     const cookieOptions = {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict' as const,
+        sameSite: 'strict',
     };
 
     return res.status(200)
@@ -139,15 +134,16 @@ export const logoutUser = asyncHandler(async (req: CustomRequest, res: Response)
 });
 
 // refreshAccessToken controller
-export const refreshAccessToken = asyncHandler(async (req: CustomRequest, res: Response) => {
+const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken || req.header("Authorization")?.replace("Bearer ", "");
 
     if (!incomingRefreshToken) {
+
         return sendErrorResponse(res, new ApiError(401, "Unauthorized request"));
     };
 
     try {
-        const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET as string) as JwtPayload;
+        const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
         const user = await UserModel.findById(decodedToken?._id);
 
         if (!user) {
@@ -158,7 +154,7 @@ export const refreshAccessToken = asyncHandler(async (req: CustomRequest, res: R
             return sendErrorResponse(res, new ApiError(401, "Refresh token is expired or used"));
         };
 
-        const cookieOption: { httpOnly: boolean, secure: boolean } = {
+        const cookieOption = {
             httpOnly: true,
             secure: true
         };
@@ -177,15 +173,15 @@ export const refreshAccessToken = asyncHandler(async (req: CustomRequest, res: R
                         "Access token refreshed"
                     )
             );
-    } catch (exc: any) {
+    } catch (exc) {
         return sendErrorResponse(res, new ApiError(401, exc.message || "Invalid refresh token"));
     };
 });
 
 // Auth user (Social)
-export const authUserSocial = asyncHandler(async (req: CustomRequest, res: Response) => {
+const authUserSocial = asyncHandler(async (req, res) => {
     try {
-        let user: any = req.user;
+        let user = req.user;
         if (!user) {
             const { email, uid, displayName, photoURL, phoneNumber, providerId, userType } = req.body;
             user = await UserModel.findOne({ email: email });
@@ -220,8 +216,18 @@ export const authUserSocial = asyncHandler(async (req: CustomRequest, res: Respo
                     )
             );
 
-    } catch (exc: any) {
+    } catch (exc) {
         console.log(exc.message);
         return res.status(500).json({ success: false, message: "Internal server error", error: exc.message });
     }
 });
+
+
+module.exports = {
+    fetchUserData,
+    registerUser,
+    loginUser,
+    logoutUser,
+    refreshAccessToken,
+    authUserSocial
+}
