@@ -1,9 +1,10 @@
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
+const dotenv = require('dotenv');
 dotenv.config({ path: './.env' });
+const connectDB = require('./db/db');
+const http = require('http');
+const { app } = require('./app');
 
-import connectDB from './db/db';
-import http from 'http';
-import { app } from "./app";
 
 const server = http.createServer(app);
 

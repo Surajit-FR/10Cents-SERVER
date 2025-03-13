@@ -1,7 +1,7 @@
-import UserModel from "../models/user.model";
-import bcryptjs from "bcryptjs"
+const UserModel = require("../models/user.model");
+const bcryptjs = require("bcryptjs");
 
-const SecurePassword = async (password: string) => {
+const SecurePassword = async (password) => {
     try {
         // Generate a salt with a cost factor of 10 (you can increase this for more security)
         const salt = await bcryptjs.genSalt(10);
@@ -14,7 +14,7 @@ const SecurePassword = async (password: string) => {
 };
 
 // GoogleAuth
-export const GoogleAuth = async (email: string, uid: string, displayName: string, photoURL: string, phoneNumber: number, userType: string) => {
+ const GoogleAuth = async (email, uid, displayName, photoURL, phoneNumber, userType) => {
     try {
         const HashedPassword = await SecurePassword(uid);
         let trimmed = displayName.trim().split(' ')
@@ -33,14 +33,14 @@ export const GoogleAuth = async (email: string, uid: string, displayName: string
 
         return userData;
 
-    } catch (exc: any) {
+    } catch (exc) {
         console.log(exc.message);
         return { message: "Error login with gmail!", err: exc.message };
     };
 };
 
 // FacebookAuth
-export const FacebookAuth = async (email: string, uid: string, displayName: string, photoURL: string, phoneNumber: number, userType: string) => {
+ const FacebookAuth = async (email, uid, displayName, photoURL, phoneNumber, userType) => {
     try {
         const HashedPassword = await SecurePassword(uid);
         let trimmed = displayName.trim().split(' ');
@@ -59,11 +59,13 @@ export const FacebookAuth = async (email: string, uid: string, displayName: stri
 
         return userData;
 
-    } catch (exc: any) {
+    } catch (exc) {
         console.log(exc.message);
         return { message: "Error logging in with Facebook!", err: exc.message };
     }
 };
 
-
-
+module.exports = {
+    GoogleAuth,
+    FacebookAuth
+}

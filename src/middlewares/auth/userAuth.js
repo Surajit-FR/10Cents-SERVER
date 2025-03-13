@@ -1,13 +1,14 @@
-import { Response, NextFunction } from 'express';
-import { ApiError } from '../../utils/ApisErrors';
-import { sendErrorResponse } from '../../utils/response';
-import { asyncHandler } from '../../utils/asyncHandler';
-import jwt, { JwtPayload } from 'jsonwebtoken';
-import UserModel from '../../models/user.model';
-import { CustomRequest } from '../../../types/commonType';
+const { ApiError } = require("../../utils/ApisErrors");
+const { sendErrorResponse } = require("../../utils/response");
+const { asyncHandler } = require("../../utils/asyncHandler");
+const jwt = require("jsonwebtoken");
+const UserModel = require("../../models/user.model");
+
+// Remove Response, NextFunction, JwtPayload, and CustomRequest as they are TypeScript types
+
 
 // VerifyToken
-export const VerifyJWTToken = asyncHandler(async (req: CustomRequest, res: Response, next: NextFunction) => {
+const VerifyJWTToken = asyncHandler(async (req, res, next) => {
     try {
         let token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
 
@@ -16,7 +17,7 @@ export const VerifyJWTToken = asyncHandler(async (req: CustomRequest, res: Respo
             return sendErrorResponse(res, new ApiError(401, "Unauthorized Request"));
         };
 
-        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string) as JwtPayload;
+        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         const user = await UserModel.findById(decodedToken?._id).select("-password -refreshToken");
 
         if (!user) {
@@ -25,14 +26,14 @@ export const VerifyJWTToken = asyncHandler(async (req: CustomRequest, res: Respo
         req.user = user;
 
         next();
-    } catch (error: any) {
+    } catch (error) {
         return sendErrorResponse(res, new ApiError(401, error.message || "Invalid access token"));
     }
 });
 
 // verifyUserType
-export const verifyUserType = (requiredUserTypes: string[] | null = null) => {
-    return asyncHandler(async (req: CustomRequest, res: Response, next: NextFunction) => {
+const verifyUserType = (requiredUserTypes = null) => {
+    return asyncHandler(async (req, res, next) => {
         if (!req.user) {
             return sendErrorResponse(res, new ApiError(401, "Unauthorized Request"));
         }
@@ -44,3 +45,8 @@ export const verifyUserType = (requiredUserTypes: string[] | null = null) => {
         next();
     });
 };
+
+module.exports = {
+    VerifyJWTToken,
+    verifyUserType
+}
