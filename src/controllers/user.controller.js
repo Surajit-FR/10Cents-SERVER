@@ -1,12 +1,13 @@
 const { asyncHandler } = require("../utils/asyncHandler");
 const UserModel = require("../models/user.model");
 const { sendSuccessResponse } = require("../utils/response");
+const { default: mongoose } = require("mongoose");
 
 // Remove Request and Response as they are TypeScript types
 
 
-// getAllUsers controller
-const getAllUsers = asyncHandler(async (req, res) => {
+// getAllCustomer controller
+const getAllCustomer = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query = '', sortBy = 'createdAt', sortType = 'desc' } = req.query;
 
     const pageNumber = parseInt(page, 10);
@@ -66,7 +67,7 @@ const getUser = asyncHandler(async (req, res) => {
         {
             $match: {
                 isDeleted: false,
-                _id: userId
+                _id: new mongoose.Types.ObjectId(userId) 
             }
         },
         {
@@ -79,14 +80,14 @@ const getUser = asyncHandler(async (req, res) => {
                 createdAt: 1,
             }
         }
-    ]);
+    ]);    
 
     return sendSuccessResponse(res, 200,
         userDetails[0],
-        "Loggedin user retrieved successfully.");
+        "User retrieved successfully.");
 });
 
 module.exports = {
-    getAllUsers,
+    getAllCustomer,
     getUser
 }
