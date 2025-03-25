@@ -62,12 +62,15 @@ const getAllCustomer = asyncHandler(async (req, res) => {
 const getUser = asyncHandler(async (req, res) => {
 
     const { userId } = req.query
+    if (!userId) {
+        return res.status(400).json({ "success": false, "message": "userId is required" })
+    }
 
     const userDetails = await UserModel.aggregate([
         {
             $match: {
                 isDeleted: false,
-                _id: new mongoose.Types.ObjectId(userId) 
+                _id: new mongoose.Types.ObjectId(userId)
             }
         },
         {
@@ -80,7 +83,7 @@ const getUser = asyncHandler(async (req, res) => {
                 createdAt: 1,
             }
         }
-    ]);    
+    ]);
 
     return sendSuccessResponse(res, 200,
         userDetails[0],
