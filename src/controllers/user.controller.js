@@ -81,6 +81,7 @@ const getUser = asyncHandler(async (req, res) => {
                 phone: 1,
                 avatar: 1,
                 createdAt: 1,
+                userType:1,
             }
         }
     ]);
