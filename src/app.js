@@ -9,7 +9,7 @@ const EXPRESS_CONFIG_LIMIT = require('./constants');
 
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: [process.env.CORS_ORIGIN,"http://13.203.196.198","http://3.110.107.103"],
     credentials: true,
 }));
 
