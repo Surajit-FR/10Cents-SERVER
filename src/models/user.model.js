@@ -60,6 +60,18 @@ const UserSchema = new Schema({
     coverImage: {
         type: String,
     },
+    longitude: {
+        type: String,
+        default: null
+    },
+    latitude: {
+        type: String,
+        default: null
+    },
+    IPAddress: {
+        type: String,
+        default: null
+    },
     isVerified: {
         type: Boolean,
         default: false

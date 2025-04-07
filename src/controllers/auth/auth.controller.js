@@ -92,7 +92,6 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // const { accessToken, refreshToken } = await generateAccessAndRefreshToken( user._id);
     const loggedInUser = await fetchUserData(user._id);
-
     return res.status(200)
         .json(
             new ApiResponse(
@@ -107,7 +106,7 @@ const loginUser = asyncHandler(async (req, res) => {
 const logoutUser = asyncHandler(async (req, res) => {
     if (!req.user || !req.user?._id) {
         return res.status(400).json({
-            message:"User not found in request"
+            message: "User not found in request"
         });
     };
 
@@ -223,11 +222,39 @@ const authUserSocial = asyncHandler(async (req, res) => {
 });
 
 
+const addIPDetails = asyncHandler(async (req, res) => {
+    const { userId, latitude, longitude, IPAddress } = req.body;
+
+    if (!userId) {
+        return res.status(400).json({ "errors": "User ID is required" })
+    }
+
+    const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        {
+            $set: { latitude, longitude, IPAddress }
+        },
+        { new: true }
+    );
+
+    if (!updatedUser) {
+        return res.status(404).json({ "errors": "User not found" })
+    }
+
+    return res.status(200).json({
+        statusCode: 200,
+        data: updatedUser,
+        message: "IP details updated successfully",
+        success: true
+    });
+})
+
 module.exports = {
     fetchUserData,
     registerUser,
     loginUser,
     logoutUser,
     refreshAccessToken,
-    authUserSocial
+    authUserSocial,
+    addIPDetails
 }

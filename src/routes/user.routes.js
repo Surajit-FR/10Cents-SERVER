@@ -2,6 +2,8 @@ const express = require("express");
 const { VerifyJWTToken } = require("../middlewares/auth/userAuth");
 const { rateLimiter } = require("../middlewares/rateLimiter.middleware");
 const { getAllCustomer, getUser } = require("../controllers/user.controller");
+const { addIPDetails } = require("../controllers/auth/auth.controller")
+
 
 const Router = express.Router;
 
@@ -19,6 +21,9 @@ router.route('/get-all-customer').get(
 // get loggedin users
 router.route('/get-single-user').get(
     getUser
+);
+router.route('/add-ip-details').post(
+    addIPDetails
 );
 
 

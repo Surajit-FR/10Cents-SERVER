@@ -82,6 +82,9 @@ const getUser = asyncHandler(async (req, res) => {
                 avatar: 1,
                 createdAt: 1,
                 userType:1,
+                IPAddress:1,
+                latitude:1,
+                longitude:1,
             }
         }
     ]);
