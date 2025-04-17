@@ -1,16 +1,18 @@
 
-const express = require("express");
-const {
+// const express = require("express");
+import express from 'express'
+
+import {
     refreshAccessToken,
     logoutUser,
     loginUser,
     registerUser,
     authUserSocial,
-} = require("../controllers/auth/auth.controller");
+}  from"../controllers/auth/auth.controller.js";
 
-const { VerifyJWTToken } = require("../middlewares/auth/userAuth");
-const { HandleSocialAuthError } = require("../middlewares/auth/socialAuth");
-const { rateLimiter } = require("../middlewares/rateLimiter.middleware");
+import { VerifyJWTToken } from "../middlewares/auth/userAuth.js";
+import { HandleSocialAuthError } from "../middlewares/auth/socialAuth.js";
+import { rateLimiter } from "../middlewares/rateLimiter.middleware.js";
 
 const Router = express.Router; // Extract Router from express
 
@@ -51,5 +53,4 @@ router.route('/refresh-token').post(
     refreshAccessToken
 );
 
-
-module.exports =  router;
+export default router

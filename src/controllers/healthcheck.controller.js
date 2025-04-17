@@ -1,11 +1,11 @@
-const { asyncHandler } = require("../utils/asyncHandler");
-const mongoose = require("mongoose");
-const os = require("os");
-const { ApiError } = require("../utils/ApisErrors");
+import mongoose from "mongoose";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import os from 'os';
+import { ApiError } from "../utils/ApisErrors.js";
 
 
 // healthcheck controller
-const healthcheck = asyncHandler(async (req, res) => {
+export const healthcheck = asyncHandler(async (req, res) => {
     try {
         const networkInterfaces = os.networkInterfaces();
 
@@ -38,6 +38,3 @@ const healthcheck = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = {
-    healthcheck
-}

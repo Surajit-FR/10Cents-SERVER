@@ -1,14 +1,14 @@
-const { ApiError } = require("../../utils/ApisErrors");
-const { sendErrorResponse } = require("../../utils/response");
-const { asyncHandler } = require("../../utils/asyncHandler");
-const jwt = require("jsonwebtoken");
-const UserModel = require("../../models/user.model");
+import { ApiError } from "../../utils/ApisErrors.js";
+import { sendErrorResponse } from "../../utils/response.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
+import jwt from "jsonwebtoken";
+import {UserModel} from "../../models/user.model.js";
 
 // Remove Response, NextFunction, JwtPayload, and CustomRequest as they are TypeScript types
 
 
 // VerifyToken
-const VerifyJWTToken = asyncHandler(async (req, res, next) => {
+export const VerifyJWTToken = asyncHandler(async (req, res, next) => {
     try {
         let token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
 
@@ -32,7 +32,7 @@ const VerifyJWTToken = asyncHandler(async (req, res, next) => {
 });
 
 // verifyUserType
-const verifyUserType = (requiredUserTypes = null) => {
+export const verifyUserType = (requiredUserTypes = null) => {
     return asyncHandler(async (req, res, next) => {
         if (!req.user) {
             return sendErrorResponse(res, new ApiError(401, "Unauthorized Request"));
@@ -46,7 +46,3 @@ const verifyUserType = (requiredUserTypes = null) => {
     });
 };
 
-module.exports = {
-    VerifyJWTToken,
-    verifyUserType
-}

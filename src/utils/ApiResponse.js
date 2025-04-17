@@ -1,4 +1,4 @@
-class ApiResponse {
+export class ApiResponse {
     statusCode;
     data;
     message;
@@ -14,4 +14,3 @@ class ApiResponse {
     }
 }
 
-module.exports = { ApiResponse };

@@ -1,10 +1,14 @@
-const express = require('express');
-const app = express();
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const morgan = require('morgan');
-const EXPRESS_CONFIG_LIMIT = require('./constants');
+import  express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import  morgan from 'morgan';
+import  {EXPRESS_CONFIG_LIMIT} from './constants.js';
+//routes
+import  healthcheckRouter from "./routes/healthcheck.routes.js";
+import authRouter from "./routes/auth.routes.js";
+import userRouter from "./routes/user.routes.js";
 
+const app = express();
 
 
 
@@ -21,10 +25,7 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 
-//routes
-const healthcheckRouter = require("./routes/healthcheck.routes");
-const authRouter = require("./routes/auth.routes");
-const userRouter = require("./routes/user.routes");
+
 
 
 //Admin routes
@@ -55,4 +56,4 @@ app.use((req, res, next) => {
 });
 
 
-module.exports =  { app };
+export default app

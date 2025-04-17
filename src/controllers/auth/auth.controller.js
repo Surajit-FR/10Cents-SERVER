@@ -1,17 +1,17 @@
-const UserModel = require("../../models/user.model");
-const { ApiError } = require("../../utils/ApisErrors");
-const { addUser } = require("../../utils/auth");
-const { sendErrorResponse } = require("../../utils/response");
-const { generateAccessAndRefreshToken } = require("../../utils/createTokens");
-const { ApiResponse } = require("../../utils/ApiResponse");
-const { asyncHandler } = require("../../utils/asyncHandler");
-const { GoogleAuth } = require("../../utils/socialAuth");
-const jwt = require("jsonwebtoken");
+import {UserModel} from "../../models/user.model.js";
+import { ApiError } from "../../utils/ApisErrors.js";
+import { addUser } from "../../utils/auth.js";
+import { sendErrorResponse } from "../../utils/response.js";
+import { generateAccessAndRefreshToken } from "../../utils/createTokens.js";
+import { ApiResponse } from "../../utils/ApiResponse.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
+import { GoogleAuth } from "../../utils/socialAuth.js";
+import jwt from "jsonwebtoken";
 
 
 
 // fetchUserData func.
-const fetchUserData = async (userId) => {
+export const fetchUserData = async (userId) => {
     const user = await UserModel.aggregate([
         {
             $match: {
@@ -30,7 +30,7 @@ const fetchUserData = async (userId) => {
 };
 
 // Set cookieOption
-const cookieOption = {
+export const cookieOption = {
     httpOnly: true,
     secure: true,
     maxAge: 24 * 60 * 60 * 1000, // 1 Day
@@ -39,7 +39,7 @@ const cookieOption = {
 
 
 // register user controller
-const registerUser = asyncHandler(async (req, res) => {
+export const registerUser = asyncHandler(async (req, res) => {
     const userData = req.body;
 
     const savedUser = await addUser(userData);
@@ -59,7 +59,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 // login user controller
-const loginUser = asyncHandler(async (req, res) => {
+export const loginUser = asyncHandler(async (req, res) => {
     const { email, password, isAdminPanel } = req.body;
 
     if (!email) {
@@ -103,7 +103,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 // logout user controller
-const logoutUser = asyncHandler(async (req, res) => {
+export const logoutUser = asyncHandler(async (req, res) => {
     if (!req.user || !req.user?._id) {
         return res.status(400).json({
             message: "User not found in request"
@@ -133,7 +133,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 // refreshAccessToken controller
-const refreshAccessToken = asyncHandler(async (req, res) => {
+export const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken || req.header("Authorization")?.replace("Bearer ", "");
 
     if (!incomingRefreshToken) {
@@ -178,7 +178,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 // Auth user (Social)
-const authUserSocial = asyncHandler(async (req, res) => {
+export const authUserSocial = asyncHandler(async (req, res) => {
     try {
         let user = req.user;
         if (!user) {
@@ -222,7 +222,7 @@ const authUserSocial = asyncHandler(async (req, res) => {
 });
 
 
-const addIPDetails = asyncHandler(async (req, res) => {
+export const addIPDetails = asyncHandler(async (req, res) => {
     const { userId, latitude, longitude, IPAddress } = req.body;
 
     if (!userId) {
@@ -248,13 +248,3 @@ const addIPDetails = asyncHandler(async (req, res) => {
         success: true
     });
 })
-
-module.exports = {
-    fetchUserData,
-    registerUser,
-    loginUser,
-    logoutUser,
-    refreshAccessToken,
-    authUserSocial,
-    addIPDetails
-}

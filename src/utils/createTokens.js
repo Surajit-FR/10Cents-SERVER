@@ -1,9 +1,9 @@
 const { ApiError } = "./ApisErrors";
-const userModel = require('../models/user.model');
+import {UserModel} from '../models/user.model.js';
 
-const generateAccessAndRefreshToken = async ( userId) => {
+export const generateAccessAndRefreshToken = async ( userId) => {
     try {
-        const user = await userModel.findById(userId);
+        const user = await UserModel.findById(userId);
         const accessToken = user?.generateAccessToken();
         const refreshToken = user?.generateRefreshToken();
 
@@ -21,7 +21,3 @@ const generateAccessAndRefreshToken = async ( userId) => {
         throw new Error("Something went wrong while generating tokens");
     };
 };
-
-module.exports = {
-    generateAccessAndRefreshToken
-}

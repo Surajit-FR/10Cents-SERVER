@@ -1,4 +1,4 @@
-class ApiError extends Error {
+export class ApiError extends Error {
     statusCode;
     data;
     success;
@@ -25,5 +25,5 @@ class ApiError extends Error {
     }
 }
 
-module.exports  = { ApiError };
+
 

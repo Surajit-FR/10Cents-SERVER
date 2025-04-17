@@ -1,11 +1,11 @@
-const { ApiResponse } = require("./ApiResponse");
+import { ApiResponse } from "./ApiResponse.js";
 
-const sendSuccessResponse = (res, statusCode, data, message = "Success") => {
+export const sendSuccessResponse = (res, statusCode, data, message = "Success") => {
     const response = new ApiResponse(statusCode, data, message);
     return res.status(response.statusCode).json(response);
 };
 
-const sendErrorResponse = (res, error) => {
+export const sendErrorResponse = (res, error) => {
     const responsePayload = {
         statusCode: error.statusCode,
         success: error.success,
@@ -21,4 +21,3 @@ const sendErrorResponse = (res, error) => {
     return res.status(error.statusCode).json(responsePayload);
 };
 
-module.exports = { sendSuccessResponse, sendErrorResponse };

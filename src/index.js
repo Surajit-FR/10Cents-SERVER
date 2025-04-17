@@ -1,9 +1,9 @@
 // import dotenv from "dotenv";
-const dotenv = require('dotenv');
+import dotenv from'dotenv';
+import http from 'http';
+import connectDB from './db/db.js';
 dotenv.config({ path: './.env' });
-const connectDB = require('./db/db');
-const http = require('http');
-const { app } = require('./app');
+import  app  from './app.js';
 
 
 const server = http.createServer(app);

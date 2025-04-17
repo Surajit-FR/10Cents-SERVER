@@ -1,7 +1,7 @@
-const UserModel = require("../models/user.model");
-const bcryptjs = require("bcryptjs");
+import {UserModel} from "../models/user.model.js";
+import  bcryptjs from "bcryptjs";
 
-const SecurePassword = async (password) => {
+export const SecurePassword = async (password) => {
     try {
         // Generate a salt with a cost factor of 10 (you can increase this for more security)
         const salt = await bcryptjs.genSalt(10);
@@ -14,7 +14,7 @@ const SecurePassword = async (password) => {
 };
 
 // GoogleAuth
- const GoogleAuth = async (email, uid, displayName, photoURL, phoneNumber, userType) => {
+ export const GoogleAuth = async (email, uid, displayName, photoURL, phoneNumber, userType) => {
     try {
         const HashedPassword = await SecurePassword(uid);
         let trimmed = displayName.trim().split(' ')
@@ -40,7 +40,7 @@ const SecurePassword = async (password) => {
 };
 
 // FacebookAuth
- const FacebookAuth = async (email, uid, displayName, photoURL, phoneNumber, userType) => {
+ export const FacebookAuth = async (email, uid, displayName, photoURL, phoneNumber, userType) => {
     try {
         const HashedPassword = await SecurePassword(uid);
         let trimmed = displayName.trim().split(' ');
@@ -64,8 +64,3 @@ const SecurePassword = async (password) => {
         return { message: "Error logging in with Facebook!", err: exc.message };
     }
 };
-
-module.exports = {
-    GoogleAuth,
-    FacebookAuth
-}

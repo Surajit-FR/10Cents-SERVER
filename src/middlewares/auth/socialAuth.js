@@ -1,12 +1,12 @@
-const UserModel = require("../../models/user.model");
-const { asyncHandler } = require("../../utils/asyncHandler");
+import {UserModel} from "../../models/user.model.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
 
 // Remove Response, NextFunction, and CustomRequest as they are TypeScript types
 
 
 
 // HandleSocialAuthError
-const HandleSocialAuthError = asyncHandler(async (req, res, next) => {
+export const HandleSocialAuthError = asyncHandler(async (req, res, next) => {
     const { email, uid, displayName, photoURL, phoneNumber } = req.body;
 
     try {
@@ -47,6 +47,3 @@ const HandleSocialAuthError = asyncHandler(async (req, res, next) => {
     }
 });
 
-module.exports = {
-    HandleSocialAuthError
-}

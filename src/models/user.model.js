@@ -1,8 +1,11 @@
-const mongoose = require("mongoose");
-const { Schema, Model } = mongoose;
-const bcryptjs = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-
+// const mongoose = require("mongoose");
+// const { Schema, Model } = mongoose;
+// const bcryptjs = require("bcryptjs");
+// const jwt = require("jsonwebtoken");
+import mongoose from "mongoose";
+import { Schema,Model } from "mongoose";
+import bcryptjs from "bcryptjs"
+import jwt from "jsonwebtoken"
 // Remove IUser import since it's a TypeScript type
 
 
@@ -120,6 +123,5 @@ UserSchema.methods.generateRefreshToken = function () {
 };
 
 
-const UserModel = mongoose.model("user", UserSchema);
-module.exports = UserModel;
+export const UserModel = mongoose.model("user", UserSchema);
 

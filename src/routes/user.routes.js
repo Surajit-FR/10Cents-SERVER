@@ -1,8 +1,8 @@
-const express = require("express");
-const { VerifyJWTToken } = require("../middlewares/auth/userAuth");
-const { rateLimiter } = require("../middlewares/rateLimiter.middleware");
-const { getAllCustomer, getUser } = require("../controllers/user.controller");
-const { addIPDetails } = require("../controllers/auth/auth.controller")
+import express from "express";
+import { VerifyJWTToken } from "../middlewares/auth/userAuth.js";
+import { rateLimiter } from "../middlewares/rateLimiter.middleware.js";
+import { getAllCustomer, getUser } from "../controllers/user.controller.js";
+import { addIPDetails } from "../controllers/auth/auth.controller.js"
 
 
 const Router = express.Router;
@@ -26,5 +26,4 @@ router.route('/add-ip-details').post(
     addIPDetails
 );
 
-
-module.exports = router;
+export default router

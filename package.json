@@ -8,6 +8,7 @@
     "start": "nodemon ./dist/index.js",
     "dev": "nodemon ./src/index.js"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",

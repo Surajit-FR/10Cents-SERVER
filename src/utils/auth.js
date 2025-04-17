@@ -1,8 +1,8 @@
-const UserModel = require("../models/user.model");
-const { ApiError } = require("./ApisErrors");
+import {UserModel} from "../models/user.model.js";
+import { ApiError } from "./ApisErrors.js";
 
 
-const addUser = async (userData) => {
+export const addUser = async (userData) => {
     const { firstName, lastName, email, password, userType, phone } = userData;
 
     // Check for duplicate user
@@ -24,7 +24,3 @@ const addUser = async (userData) => {
 
     return savedUser;
 };
-
-module.exports = {
-    addUser
-}
