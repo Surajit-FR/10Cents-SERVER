@@ -73,6 +73,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     }
 
     const userId = user._id;
+console.log(password);
 
     const isPasswordValid = await user.isPasswordCorrect(password);
     if (!isPasswordValid) {

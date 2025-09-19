@@ -13,7 +13,7 @@ const app = express();
 
 
 app.use(cors({
-    origin: [process.env.CORS_ORIGIN,"http://13.203.196.198","http://3.110.107.103"],
+    origin: [process.env.CORS_ORIGIN,"http://13.203.196.198","http://3.110.107.103",'http://localhost:3000',],
     credentials: true,
 }));
 

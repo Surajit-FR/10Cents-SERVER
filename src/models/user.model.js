@@ -3,7 +3,7 @@
 // const bcryptjs = require("bcryptjs");
 // const jwt = require("jsonwebtoken");
 import mongoose from "mongoose";
-import { Schema,Model } from "mongoose";
+import { Schema, Model } from "mongoose";
 import bcryptjs from "bcryptjs"
 import jwt from "jsonwebtoken"
 // Remove IUser import since it's a TypeScript type
@@ -103,6 +103,9 @@ UserSchema.pre("save", async function (next) {
 
 //check password
 UserSchema.methods.isPasswordCorrect = async function (password) {
+    console.log("isPasswordCorrect checked", password);
+    console.log(this.password);
+    console.log(await bcryptjs.compare(password, this.password));
     return await bcryptjs.compare(password, this.password)
 }
 
